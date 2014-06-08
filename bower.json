@@ -1,0 +1,29 @@
+{
+  "name": "backgrid-sizeable-columns",
+  "main": [
+    "backgrid-sizeable-columns.js",
+    "backgrid-sizeable-columns.css"
+  ],
+  "version": "0.0.1",
+  "description": "Backgrid.js extension for (re)sizeable columns",
+  "homepage": "https://github.com/WRidder/backgrid-sizeable-columns",
+  "authors": [
+    "Wilbert van de Ridder <wilbert.ridder@gmail.com>"
+  ],
+  "keywords": [
+    "backbone",
+    "backgrid"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "backgrid": "~0.3.0",
+    "backbone": "~1.1.0"
+  }
+}

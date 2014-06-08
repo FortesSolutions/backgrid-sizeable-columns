@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Backgrid.js Core",
+    "groups": [{
+      "name": "Others",
+      "classes": [
+        "Backgrid.Grid"
+      ]
+    }]
+  },
+  {
+    "name": "Backgrid.js Extensions",
+    "groups": [
+      {
+        "name": "SizeAbleColumns",
+        "classes": [
+          "Backgrid.Extension.SizeAbleColumns",
+          "Backgrid.Extension.SizeAbleColumnsHandlers"
+        ]
+      }
+    ]
+  }
+]

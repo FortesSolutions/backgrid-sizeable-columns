@@ -1,0 +1,22 @@
+{
+  "name": "backgrid-sizeable-columns",
+  "repo": "WRidder/backgrid-sizeable-columns",
+  "description": "Backgrid.js extension for sizeable columns.",
+  "version": "0.0.1",
+  "keywords": [
+    "backbone",
+    "backgrid"
+  ],
+  "main": "backgrid-sizeable-columns.js",
+  "scripts": [
+    "backgrid-sizeable-columns.js"
+  ],
+  "styles": [
+    "backgrid-sizeable-columns.css"
+  ],
+  "dependencies": {
+    "jashkenas/backbone": "*",
+    "wyuenho/backgrid": "0.3.5"
+  },
+  "license": "MIT"
+}
