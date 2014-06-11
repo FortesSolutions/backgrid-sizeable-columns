@@ -94,6 +94,14 @@
       var view = this;
       view.$el.empty();
 
+      // Event helper function
+      var stopEvent = function(e) {
+        if(e.stopPropagation) e.stopPropagation();
+        if(e.preventDefault) e.preventDefault();
+        e.cancelBubble=true;
+        e.returnValue=false;
+      };
+
       // For now, loop tds in first row
       _.each(view.headerElements, function(columnEl, index) {
         // Get matching col element
@@ -116,7 +124,8 @@
 
           // Make draggable
           $resizeHandler.on("mousedown", function(e) {
-            var startX = Math.round($resizeHandler.offset().left);
+            stopEvent(e);
+            var startX = $resizeHandler.offset().left;
             var $doc = $(document);
             var handlerNonDragSize = $resizeHandler.outerWidth();
 
@@ -126,6 +135,8 @@
 
             // Follow the mouse
             var mouseMoveHandler = function(evt) {
+              stopEvent(evt);
+
               // Check for constraints
               var minWidth = columnModel.get("minWidth");
               if (!minWidth || minWidth < 20) {
@@ -133,7 +144,7 @@
               }
               var maxWidth = columnModel.get("maxWidth");
               var newLeftPos = evt.pageX;
-              var currentWidth = $col.width();
+              var currentWidth = columnModel.get("width");
               var newWidth = currentWidth + (newLeftPos - startX) - handlerNonDragSize / 2;
 
               if (minWidth && newWidth <= minWidth) {
@@ -151,8 +162,9 @@
             $doc.on("mousemove", mouseMoveHandler);
 
             // Add handler to listen for mouseup
-            var mouseUpHandler = function() {
+            var mouseUpHandler = function(evt) {
               // Cleanup
+              stopEvent(evt);
               $resizeHandler.removeClass("grid-draggable");
               $resizeHandlerHelper.hide();
               $doc.off("mouseup", mouseUpHandler);
@@ -181,8 +193,6 @@
               }
             };
             $doc.on("mouseup", mouseUpHandler);
-
-            e.preventDefault();
           });
         }
       });
@@ -207,19 +217,12 @@
     },
     updateHandlerPosition: function() {
       var view = this;
-      var left = 0;
+      _.each(view.headerElements, function(columnEl, index) {
+        var $column = $(columnEl);
 
-      view.sizeAbleColumns.$el.find("col").each(function(index, col) {
-        var $col = $(col);
-        var columnModel = view.columns.get($col.data("column-id"));
-        var $column = $(view.headerElements[index]);
-
-        if (columnModel.get("resizeAble")) {
-          // Get handler for current column and update position
-          view.$el.children().filter("[data-column-index='" + index + "']")
-            .css("left", $column.position().left + $column.outerWidth());
-        }
-        left += $(col).width();
+        // Get handler for current column and update position
+        view.$el.children().filter("[data-column-index='" + index + "']")
+          .css("left", $column.position().left + $column.outerWidth());
       });
     },
     setHeaderElements: function() {
