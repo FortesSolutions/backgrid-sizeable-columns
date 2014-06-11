@@ -1,10 +1,17 @@
-# Backgrid.js - (Re)sizeable columns PoC
-Warning! This is by far not production ready code, just a mere proof of concept. It lacks documentation, automatic testing, IE browser support (somehow, did work before) and edge-case tests.
+# Backgrid.js - (Re)sizeable columns
+Warning! This extension is not production ready yet, just a mere proof of concept. It lacks documentation, automatic testing and edge-case tests.
 
-## Demo website
-Online demo of PoC can be found [here](http://techwuppet.com/backgrid_poc_demo/)
+To discuss this extension, see [this](https://github.com/wyuenho/backgrid/issues/6) backgrid issue;
 
-## (Re)sizeable columns
+## Demo
+Online demo can be found [here](http://techwuppet.com/backgrid_poc_demo/)
+
+## Browser support (tested)
+- IE8+
+- Firefox
+- Chrome
+
+## Features
 - Uses html5 valid colgroup method to (re)size columns
 - Supports nonresizeable, width, min and max width
 - Trigger event on column resize
