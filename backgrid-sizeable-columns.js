@@ -195,30 +195,20 @@
     attachEvents: function() {
       this.listenTo(this.columns, "change:resizeAble", this.render);
       this.listenTo(this.columns, "change:width", this.updateHandlerPosition);
-      this.listenTo(this.columns, "add remove", function() {
-        this.setHeaderElements();
-        this.render();
-      }.bind(this));
       this.listenTo(this.grid.collection, "backgrid:refresh", this.render);
       this.listenTo(this.grid.collection, "backgrid:colgroup:updated", function() {
-        this.setHeaderElements();
-        this.render();
+        // Wait for callstack to be cleared
+        // TODO: see if we can do without this delay function
+        _.delay(function() {
+          this.setHeaderElements();
+          this.render();
+        }.bind(this), 0);
       }.bind(this));
     },
     updateHandlerPosition: function() {
       var view = this;
-/*      _.each(view.headerElements, function(columnEl, index) {
-       var $column = $(columnEl);
-       var $col = view.sizeAbleColumns.$el.find("col").eq(index);
-       var columnModel = view.columns.get($col.data("column-id"));
-
-       if (columnModel.get("resizeAble")) {
-       // Get handler for current column and update position
-       view.$el.children().filter("[data-column-index='" + index + "']")
-       .css("left", $column.position().left + $column.outerWidth() + "px");
-       }
-       });*/
       var left = 0;
+
       view.sizeAbleColumns.$el.find("col").each(function(index, col) {
         var $col = $(col);
         var columnModel = view.columns.get($col.data("column-id"));
@@ -227,7 +217,7 @@
         if (columnModel.get("resizeAble")) {
           // Get handler for current column and update position
           view.$el.children().filter("[data-column-index='" + index + "']")
-            .css("left", $column.position().left + $column.outerWidth() + "px");
+            .css("left", $column.position().left + $column.outerWidth());
         }
         left += $(col).width();
       });
@@ -245,7 +235,6 @@
       else {
         // Get all rows in the header
         var rowAmount = $rows.length;
-
         $rows.each(function(index, row) {
           // Loop all cells
           $(row).children("th").each(function(ind, cell) {
@@ -254,7 +243,7 @@
               ($cell.attr("rowspan") == rowAmount - index ||
                 (index + 1 === rowAmount && typeof $cell.attr("rowspan") == "undefined"))) {
               view.headerElements.push(cell);
-            }                
+            }
           });                 
         });
 
