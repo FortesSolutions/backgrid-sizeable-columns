@@ -15,7 +15,7 @@
   else factory(root._, root.Backgrid, root.moment);
 
 }(this, function (_, Backgrid) {
-
+  "use strict";
 
   // Adds width support to columns
   Backgrid.Extension.SizeAbleColumns = Backbone.View.extend({
