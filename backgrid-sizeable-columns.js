@@ -203,17 +203,18 @@
       return this;
     },
     attachEvents: function() {
-      this.listenTo(this.columns, "change:resizeAble", this.render);
-      this.listenTo(this.columns, "change:width", this.updateHandlerPosition);
-      this.listenTo(this.grid.collection, "backgrid:refresh", this.render);
-      this.listenTo(this.grid.collection, "backgrid:colgroup:updated", function() {
+      var view = this;
+      view.listenTo(view.columns, "change:resizeAble", view.render);
+      view.listenTo(view.columns, "change:width", view.updateHandlerPosition);
+      view.listenTo(view.grid.collection, "backgrid:refresh", view.render);
+      view.listenTo(view.grid.collection, "backgrid:colgroup:updated", function() {
         // Wait for callstack to be cleared
         // TODO: see if we can do without this delay function
         _.delay(function() {
-          this.setHeaderElements();
-          this.render();
-        }.bind(this), 0);
-      }.bind(this));
+          view.setHeaderElements();
+          view.render();
+        }, 0);
+      });
     },
     updateHandlerPosition: function() {
       var view = this;
