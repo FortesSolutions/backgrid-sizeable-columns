@@ -6,14 +6,17 @@
  Licensed under the MIT @license.
  */
 (function (root, factory) {
-
   // CommonJS
   if (typeof exports == "object") {
     module.exports = factory(require("underscore"), require("backgrid"));
   }
+  // AMD. Register as an anonymous module.
+  else if (typeof define === 'function' && define.amd) {
+    define(['underscore', 'backgrid'], factory);
+  }
   // Browser
   else {
-    factory(root._, root.Backgrid, root.moment);
+    factory(root._, root.Backgrid);
   }
 
 }(this, function (_, Backgrid) {
@@ -25,9 +28,8 @@
     tagName: "colgroup",
 
     /**
-     Initializer.
-     @param {Object} options
-     @param {Backgrid.Grid} options.grid Backgrid grid instance
+     * Initializer
+     * @param options
      */
     initialize: function (options) {
       this.grid = options.grid;
@@ -36,10 +38,13 @@
       this.listenTo(this.grid.header, "backgrid:header:rendered", this.render);
       this.listenTo(this.grid.columns, "width:auto", this.setWidthAuto);
       this.listenTo(this.grid.columns, "width:fixed", this.setWidthFixed);
+      this.listenTo(this.grid, "backgrid:refresh", this.setColToActualWidth);
+      this.listenTo(this.grid.collection, "add remove reset", this.setColToActualWidth);
     },
 
     /**
-     Renders a column group.
+     * Adds sizeable columns using <col> elements in a <colgroup>
+     * @returns {Backgrid.Extension.SizeAbleColumns}
      */
     render: function () {
       var view = this;
@@ -47,11 +52,10 @@
 
       view.grid.columns.each(function (col) {
         if (typeof col.get("renderable") == "undefined" || col.get("renderable")) {
-          var $colEl = $("<col>").appendTo(view.$el).attr("data-column-id", col.cid);
+          var $colEl = $("<col>").appendTo(view.$el).attr("data-column-cid", col.cid);
           var colWidth = col.get("width");
           var colMinWidth = col.get("minWidth");
           var colMaxWidth = col.get("maxWidth");
-
           if (colWidth && colWidth != "*") {
             if (colMinWidth && colWidth < colMinWidth) {
               colWidth = colMinWidth;
@@ -65,12 +69,35 @@
       });
 
       // Trigger event
-      view.grid.collection.trigger("backgrid:colgroup:updated");
+      view.grid.collection.trigger("backgrid:colgroup:changed");
       return this;
     },
+
+    /**
+     * Gets a <col> element belonging to given model
+     * @param colModel Backgrid.Column
+     * @returns {*|JQuery|any|jQuery}
+     * @private
+     */
     getColumnElement: function (colModel) {
-      return this.$el.find('col[data-column-id="' + colModel.cid + '"]');
+      return this.$el.find('col[data-column-cid="' + colModel.cid + '"]');
     },
+
+    /**
+     * Get the column width of given model
+     * @param colModel Backgrid.Column
+     * @returns {Integer}
+     * @private
+     */
+    getHeaderElementWidth: function(colModel) {
+      return this.grid.header.$el.find("th[data-column-cid='" + colModel.cid + "']").outerWidth();
+    },
+
+    /**
+     * Sets a width of the given column to "*" (auto)
+     * @param colModel Backgrid.Column
+     * @private
+     */
     setWidthAuto: function (colModel) {
       // Get column element
       var $colElement = this.getColumnElement(colModel);
@@ -80,29 +107,58 @@
 
       // Set column width to auto
       $colElement.css("width", "");
+
+      view.grid.collection.trigger("backgrid:colgroup:updated");
     },
+
+    /**
+     * Sets a width of the given column to a fixed width defined in the model.
+     * @param colModel Backgrid.Column
+     * @private
+     */
     setWidthFixed: function (colModel) {
       // Get column element
       var $colElement = this.getColumnElement(colModel);
 
       // Get width of header element
-      var width = this.grid.header.$el.find("th[data-columnname='" + colModel.get("name") + "']").outerWidth();
+      var width = this.getHeaderElementWidth(colModel);
 
       // Set column width to the original width
       $colElement.css("width", width);
 
       // Save width
       colModel.set("width", width);
+
+      view.grid.collection.trigger("backgrid:colgroup:updated");
+    },
+
+    /**
+     * Updates the view's <col> elements to current width
+     * @private
+     */
+    setColToActualWidth: function() {
+      var view = this;
+      var changed = false;
+      _.each(view.grid.header.row.cells, function(cell) {
+        var $colEl = view.getColumnElement(cell.column);
+        if (cell.column.get("width") !== "*") {
+          changed = changed || $colEl.width() == cell.$el.outerWidth();
+          $colEl.width(cell.$el.outerWidth());
+        }
+      });
+
+      if (changed) {
+        view.grid.collection.trigger("backgrid:colgroup:updated");
+      }
     }
   });
 
   // Makes column resizable; requires Backgrid.Extension.sizeAbleColumns
   Backgrid.Extension.SizeAbleColumnsHandlers = Backbone.View.extend({
-    /**
-     Initializer.
 
-     @param {Object} options
-     @param {Backbone.Collection.<Backgrid.Column>|Array.<Backgrid.Column>|Array.<Object>} options.columns Column metadata.
+    /**
+     * Initializer
+     * @param options
      */
     initialize: function (options) {
       this.sizeAbleColumns = options.sizeAbleColumns;
@@ -116,7 +172,8 @@
     },
 
     /**
-     Renders a column group.
+     * Adds handlers to resize the columns
+     * @returns {Backgrid.Extension.SizeAbleColumnsHandlers}
      */
     render: function () {
       var view = this;
@@ -127,11 +184,10 @@
         // Get matching col element
         var $column = $(columnEl);
         var $col = view.sizeAbleColumns.$el.find("col").eq(index);
-        var columnModel = view.columns.get($col.data("column-id"));
+        var columnModel = view.columns.get({ cid: $col.data("column-cid")});
 
         if (columnModel.get("resizeable") &&
           (typeof columnModel.get("renderable") == "undefined" || columnModel.get("renderable"))) {
-
           // Create helper elements
           var $resizeHandler = $("<div></div>")
             .addClass("resizeHandler")
@@ -145,7 +201,7 @@
           // Make draggable
           $resizeHandler.on("mousedown", function (e) {
             view._stopEvent(e);
-            var startX = $resizeHandler.offset().left;
+            var startX = Math.round($resizeHandler.offset().left);
             var $doc = $(document);
             var handlerNonDragSize = $resizeHandler.outerWidth();
 
@@ -197,15 +253,19 @@
               var newWidth = oldWidth - offset;
               $col.width(newWidth);
 
+              // Get actual width
+              var finalWidth = $column.outerWidth();
+              $col.width(finalWidth);
+
               // Save width and trigger events
-              if (newWidth != oldWidth) {
+              if (finalWidth != oldWidth) {
                 if (view.saveColumnWidth) {
                   // Save updated width
-                  columnModel.set("width", newWidth, {silent: true});
+                  columnModel.set("width", finalWidth, {silent: true});
                 }
 
                 // Trigger event
-                view.columns.trigger("resize", columnModel, newWidth, oldWidth);
+                view.columns.trigger("resize", columnModel, finalWidth, oldWidth);
               }
               view.updateHandlerPosition();
             };
@@ -219,6 +279,11 @@
 
       return this;
     },
+    /**
+     * Helper function to prevent event propagation
+     * @param e {Event}
+     * @private
+     */
     _stopEvent: function (e) {
       if (e.stopPropagation) {
         e.stopPropagation();
@@ -229,13 +294,18 @@
       e.cancelBubble = true;
       e.returnValue = false;
     },
+
+    /**
+     * Add listeners
+     * @private
+     */
     attachEvents: function () {
       var view = this;
       view.listenTo(view.columns, "change:resizeable", view.render);
       view.listenTo(view.columns, "resize width:auto width:fixed add remove", view.checkSpacerColumn);
-      view.listenTo(view.columns, "width:auto width:fixed", view.updateHandlerPosition);
-      view.listenTo(view.grid.collection, "backgrid:refresh", view.render);
-      view.listenTo(view.grid.collection, "backgrid:colgroup:updated", function () {
+      //view.listenTo(view.columns, "width:auto width:fixed", view.updateHandlerPosition);
+      view.listenTo(view.grid.collection, "backgrid:colgroup:updated", view.updateHandlerPosition);
+      view.listenTo(view.grid.collection, "backgrid:colgroup:changed", function () {
         // Wait for callstack to be cleared
         _.defer(function () {
           view.setHeaderElements();
@@ -243,6 +313,12 @@
         });
       });
     },
+
+    /**
+     * Checks whether a spacer column is nessecary. This is the case when widths are set on all columns and it's smaller
+     * that the grid element width.
+     * @private
+     */
     checkSpacerColumn: function () {
       var view = this;
       var spacerColumn = _.first(view.columns.where({name: "__spacerColumn"}));
@@ -262,18 +338,7 @@
           // The grid is larger than the cumulative column width, we need a spacer column
           if (!spacerColumn) {
             // Create new column model
-            view.columns.add({
-              name: "__spacerColumn",
-              label: "",
-              editable: false,
-              cell: Backgrid.StringCell,
-              width: "*",
-              nesting: [],
-              resizeable: false,
-              sortable: false,
-              orderable: false,
-              position: 9999
-            });
+            view.columns.add(view.getSpacerColumn());
           }
         }
         else {
@@ -287,6 +352,20 @@
         view.columns.remove(spacerColumn);
       }
     },
+
+    /**
+     * Returns a spacer column definition
+     * @returns Object
+     * @private
+     */
+    getSpacerColumn: function() {
+      return Backgrid.Extension.SizeAbleColumns.spacerColumnDefinition;
+    },
+
+    /**
+     * Updates the position of the handlers
+     * @private
+     */
     updateHandlerPosition: function () {
       var view = this;
       _.each(view.headerElements, function (columnEl, index) {
@@ -297,6 +376,10 @@
           .css("left", $column.position().left + $column.outerWidth());
       });
     },
+
+    /**
+     * Find the current header elements and stores them
+     */
     setHeaderElements: function () {
       var view = this;
       var $headerEl = view.grid.header.$el;
@@ -329,4 +412,21 @@
       }
     }
   });
+
+  /**
+   * Sample definition for the spacer column
+   */
+  Backgrid.Extension.SizeAbleColumns.spacerColumnDefinition = {
+    name: "__spacerColumn",
+    label: "",
+    editable: false,
+    cell: Backgrid.StringCell,
+    width: "*",
+    nesting: [],
+    resizeable: false,
+    sortable: false,
+    orderable: false,
+    displayOrder: 9999
+  };
+  return Backgrid;
 }));
