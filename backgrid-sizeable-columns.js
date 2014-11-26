@@ -265,7 +265,7 @@
                 }
 
                 // Trigger event
-                view.columns.trigger("resize", columnModel, finalWidth, oldWidth);
+                columnModel.trigger("resize", columnModel, finalWidth, oldWidth);
               }
               view.updateHandlerPosition();
             };
