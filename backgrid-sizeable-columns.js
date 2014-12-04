@@ -266,6 +266,14 @@
 
                 // Trigger event
                 columnModel.trigger("resize", columnModel, finalWidth, oldWidth);
+
+                // Check if we have an autosize column, if so, trigger resize on it as well
+                var autoWidthColumn = view.columns.findWhere({
+                  width: "*"
+                });
+                if (autoWidthColumn) {
+                  autoWidthColumn.trigger("resize", autoWidthColumn);
+                }
               }
               view.updateHandlerPosition();
             };
