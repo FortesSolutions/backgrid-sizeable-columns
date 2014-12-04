@@ -33,10 +33,10 @@ var BackgridHeaderCellRenderMethod = function () {
 
   this.$el.append(label);
   this.$el.addClass(column.get("name"));
-  this.$el.attr('data-columnname', column.get('name'));
+  this.$el.attr("data-column-cid", column.cid);
   this.$el.addClass(column.get("direction"));
-  if (column.get('attributes')) {
-    this.$el.attr(column.get('attributes'));
+  if (column.get("attributes")) {
+    this.$el.attr(column.get("attributes"));
   }
   this.delegateEvents();
   return this;
