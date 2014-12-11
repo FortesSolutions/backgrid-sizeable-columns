@@ -1,7 +1,7 @@
 # Backgrid.js - (Re)sizeable columns
 Warning! This extension is not production ready yet, just a mere proof of concept. It lacks documentation, automatic testing and edge-case tests.
 
-To discuss this extension, see [this](https://github.com/wyuenho/backgrid/issues/6) backgrid issue;
+To discuss this extension, see [this](https://github.com/wyuenho/backgrid/issues/6) backgrid issue.
 
 ## Demo
 Online demo can be found [here](http://techwuppet.com/backgrid_poc_demo/)
