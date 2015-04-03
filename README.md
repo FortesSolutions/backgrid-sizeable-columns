@@ -4,7 +4,7 @@ Warning! This extension is not production ready yet, just a mere proof of concep
 To discuss this extension, see [this](https://github.com/wyuenho/backgrid/issues/6) backgrid issue.
 
 ## Demo
-Online demo can be found [here](http://techwuppet.com/backgrid_poc_demo/)
+Online demo can be found [here](http://wridder.github.io/backgrid-demo/)
 
 ## Browser support (tested)
 - IE8+
