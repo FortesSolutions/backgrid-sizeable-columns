@@ -36,7 +36,6 @@
 
       // Attach event listeners once on render
       this.listenTo(this.grid.header, "backgrid:header:rendered", this.render);
-      this.listenTo(this.grid.columns, "change:renderable", this.render);
       this.listenTo(this.grid.columns, "width:auto", this.setWidthAuto);
       this.listenTo(this.grid.columns, "width:fixed", this.setWidthFixed);
       this.listenTo(this.grid, "backgrid:refresh", this.setColToActualWidth);
@@ -326,7 +325,6 @@
       var view = this;
       view.listenTo(view.columns, "change:resizeable", view.render);
       view.listenTo(view.columns, "resize width:auto width:fixed add remove", view.checkSpacerColumn);
-      //view.listenTo(view.columns, "width:auto width:fixed", view.updateHandlerPosition);
       view.listenTo(view.grid.collection, "backgrid:colgroup:updated", view.updateHandlerPosition);
       view.listenTo(view.grid.collection, "backgrid:colgroup:changed", function () {
         // Wait for callstack to be cleared
@@ -335,6 +333,9 @@
           view.render();
         });
       });
+      
+      var resizeEvtHandler = _.debounce(_.bind(view.updateHandlerPosition, view), 250);
+      view.listenTo(view._asEvents(window), "resize", resizeEvtHandler);
     },
 
     /**
@@ -437,7 +438,27 @@
      self.headerElements = _.map(self.headerCells, function (cell) {
        return cell.el;
      });
-   }
+		},
+
+    /**
+     * Use Backbone Events listenTo/stopListening with any DOM element
+     *
+     * @param {DOM Element}
+     * @return {Backbone Events style object}
+     **/
+    _asEvents: function(el) {
+      var args;
+      return {
+        on: function(event, handler) {
+          if (args) throw new Error("this is one off wrapper");
+          el.addEventListener(event, handler, false);
+          args = [event, handler];
+        },
+        off: function() {
+          el.removeEventListener.apply(el, args);
+        }
+      };
+    }
   });
 
   /**
