@@ -1,6 +1,6 @@
 {
   "name": "backgrid-sizeable-columns",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Backgrid.js extension for (re)sizeable columns.",
   "main": "backgrid-sizeable-columns.js",
   "scripts": {
