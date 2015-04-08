@@ -4,7 +4,7 @@
     "backgrid-sizeable-columns.js",
     "backgrid-sizeable-columns.css"
   ],
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Backgrid.js extension for (re)sizeable columns",
   "homepage": "https://github.com/WRidder/backgrid-sizeable-columns",
   "authors": [
