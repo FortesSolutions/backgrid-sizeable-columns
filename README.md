@@ -1,4 +1,6 @@
 # Backgrid.js - (Re)sizeable columns
+
+[![Join the chat at https://gitter.im/FortesSolutions/backgrid-sizeable-columns](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/FortesSolutions/backgrid-sizeable-columns?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Warning! This extension is not production ready yet, just a mere proof of concept. It lacks documentation, automatic testing and edge-case tests.
 
 To discuss this extension, see [this](https://github.com/wyuenho/backgrid/issues/6) backgrid issue.
