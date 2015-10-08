@@ -334,8 +334,8 @@
         });
       });
       
-      var resizeEvtHandler = _.debounce(_.bind(view.updateHandlerPosition, view), 250);
-      view.listenTo(view._asEvents(window), "resize", resizeEvtHandler);
+      this.resizeEvtHandler = _.debounce(_.bind(view.updateHandlerPosition, view), 250);
+      $(window).on("resize", this.resizeEvtHandler);
     },
 
     /**
@@ -438,26 +438,11 @@
      self.headerElements = _.map(self.headerCells, function (cell) {
        return cell.el;
      });
-		},
-
-    /**
-     * Use Backbone Events listenTo/stopListening with any DOM element
-     *
-     * @param {DOM Element}
-     * @return {Backbone Events style object}
-     **/
-    _asEvents: function(el) {
-      var args;
-      return {
-        on: function(event, handler) {
-          if (args) throw new Error("this is one off wrapper");
-          el.addEventListener(event, handler, false);
-          args = [event, handler];
-        },
-        off: function() {
-          el.removeEventListener.apply(el, args);
-        }
-      };
+    },
+    
+    remove: function() {
+      $(window).off("resize", this.resizeEvtHandler);
+      Backbone.View.prototype.remove.call(this);
     }
   });
 
