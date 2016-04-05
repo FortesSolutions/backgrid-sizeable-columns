@@ -44,7 +44,7 @@ columns.on('resize', function(columnModel, newWidth, oldWidth) {
 ```
 
 ## License
-Copyright © 2014 [Fortes Solutions](https://www.fortesglobal.com/en).
+Copyright © 2016 [Fortes Solutions](https://www.fortesglobal.com/en).
 
 Licensed under the [MIT license](LICENSE-MIT "MIT License").
 
