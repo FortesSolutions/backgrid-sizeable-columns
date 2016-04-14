@@ -1,8 +1,8 @@
 /*
  backgrid-sizeable-columns
- https://github.com/WRidder/backgrid-sizeable-columns
+ https://github.com/FortesSolutions/backgrid-sizeable-columns
 
- Copyright (c) 2014 Wilbert van de Ridder
+ Copyright (c) Fortes Solutions
  Licensed under the MIT @license.
  */
 (function (root, factory) {
@@ -122,7 +122,7 @@
       // Set column width to auto
       $colElement.css("width", "");
 
-      view.grid.collection.trigger("backgrid:colgroup:updated");
+      this.grid.collection.trigger("backgrid:colgroup:updated");
     },
 
     /**
@@ -143,7 +143,7 @@
       // Save width
       colModel.set("width", width);
 
-      view.grid.collection.trigger("backgrid:colgroup:updated");
+      this.grid.collection.trigger("backgrid:colgroup:updated");
     },
 
     /**
@@ -432,7 +432,7 @@
      // Filter cells
      self.headerCells = _.filter(headerCells, function(cell) {
        return cell.column.get("renderable") === true ||
-       typeof cell.column.get("renderable") === "undefined"
+       typeof cell.column.get("renderable") === "undefined";
      });
 
      self.headerElements = _.map(self.headerCells, function (cell) {
