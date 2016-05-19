@@ -169,6 +169,7 @@
 
 	// Makes column resizable; requires Backgrid.Extension.sizeAbleColumns
 	Backgrid.Extension.SizeAbleColumnsHandlers = Backbone.View.extend({
+		minWidthDynamicColumns: 80,
 
 		/**
 		 * Initializer
@@ -181,6 +182,10 @@
 			this.header = this.grid.header;
 
 			this.saveColumnWidth = options.saveColumnWidth;
+			if (options.minWidthDynamicColumns != null) {
+				this.minWidthDynamicColumns = options.minWidthDynamicColumns;
+			}
+
 			this.setHeaderElements();
 			this.attachEvents();
 			
@@ -380,6 +385,7 @@
 			// Check if there is a column with auto width, if so, no need to do anything
 			if (_.isEmpty(autoColumns)) {
 				var totalWidth = view.columns.reduce(function (memo, num) {
+					// count 0 pixels for the spacer column
 					var colWidth = (num.get("width") == "*") ? 0 : num.get("width");
 					return memo + colWidth;
 				}, 0);
@@ -392,13 +398,17 @@
 						view.columns.add(view.getSpacerColumn());
 					}
 				}
-				else if (spacerColumn) {
-					// Cumulative column width exceeds grid width, no need for a spacerColumn.
+			}
+			else {
+				if (spacerColumn) {
 					view.columns.remove(spacerColumn);
 				}
-			}
-			else if (spacerColumn) {
-				view.columns.remove(spacerColumn);
+				
+				var columnsWidth = this.columns.reduce(function (memo, column) {
+					return memo + (column.get('width') == '*' ? this.minWidthDynamicColumns : column.get('width'));
+				}, 0, this);
+				// min width on columns does not work, therefore place the min width on the table itself
+				this.grid.$el.css('min-width', columnsWidth + 'px');
 			}
 		},
 
