@@ -395,13 +395,13 @@
 					// The grid is larger than the cumulative column width, we need a spacer column
 					if (!spacerColumn) {
 						// Create new column model
-						view.columns.add(view.getSpacerColumn());
+						view.columns.add(view.getSpacerColumn(), {silent: true});
 					}
 				}
 			}
 			else {
 				if (spacerColumn) {
-					view.columns.remove(spacerColumn);
+					view.columns.remove(spacerColumn, {silent: true});
 				}
 				
 				var columnsWidth = this.columns.reduce(function (memo, column) {
