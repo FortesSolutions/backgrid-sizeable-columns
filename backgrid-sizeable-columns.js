@@ -170,7 +170,7 @@
 	// Makes column resizable; requires Backgrid.Extension.sizeAbleColumns
 	Backgrid.Extension.SizeAbleColumnsHandlers = Backbone.View.extend({
 		minWidthDynamicColumns: 80,
-
+		
 		/**
 		 * Initializer
 		 * @param options
@@ -185,11 +185,11 @@
 			if (options.minWidthDynamicColumns != null) {
 				this.minWidthDynamicColumns = options.minWidthDynamicColumns;
 			}
-
+			
 			this.setHeaderElements();
 			this.attachEvents();
 			
-			this.checkSpacerColumn();
+			this.checkSpacerColumn(false);
 		},
 
 		/**
@@ -375,7 +375,11 @@
 		 * that the grid element width.
 		 * @private
 		 */
-		checkSpacerColumn: function () {
+		checkSpacerColumn: function (silent) {
+			if (silent == null) {
+				silent = true;
+			}
+			
 			var view = this;
 			var spacerColumn = _.first(view.columns.where({name: "__spacerColumn"}));
 			var autoColumns = view.columns.filter(function (col) {
@@ -384,24 +388,14 @@
 
 			// Check if there is a column with auto width, if so, no need to do anything
 			if (_.isEmpty(autoColumns)) {
-				var totalWidth = view.columns.reduce(function (memo, num) {
-					// count 0 pixels for the spacer column
-					var colWidth = (num.get("width") == "*") ? 0 : num.get("width");
-					return memo + colWidth;
-				}, 0);
-				var gridWidth = view.grid.$el.width();
-
-				if (gridWidth > totalWidth) {
-					// The grid is larger than the cumulative column width, we need a spacer column
-					if (!spacerColumn) {
-						// Create new column model
-						view.columns.add(view.getSpacerColumn(), {silent: true});
-					}
+				if (!spacerColumn) {
+					// Create new column model
+					view.columns.add(view.getSpacerColumn(), {silent: silent});
 				}
 			}
 			else {
 				if (spacerColumn) {
-					view.columns.remove(spacerColumn, {silent: true});
+					view.columns.remove(spacerColumn, {silent: silent});
 				}
 				
 				var columnsWidth = this.columns.reduce(function (memo, column) {
@@ -498,4 +492,3 @@
 	};
 	return Backgrid;
 }));
-
