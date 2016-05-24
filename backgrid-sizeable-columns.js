@@ -391,11 +391,13 @@
 				if (!spacerColumn) {
 					// Create new column model
 					view.columns.add(view.getSpacerColumn(), {silent: silent});
+					view.updateHandlerPosition();
 				}
 			}
 			else {
 				if (spacerColumn) {
 					view.columns.remove(spacerColumn, {silent: silent});
+					view.updateHandlerPosition();
 				}
 				
 				var columnsWidth = this.columns.reduce(function (memo, column) {
